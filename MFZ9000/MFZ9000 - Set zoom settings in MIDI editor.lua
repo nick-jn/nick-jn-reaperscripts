@@ -1,6 +1,12 @@
 -- For use with "MFZ9000 open MIDI item" only.
 -- For use in MIDI editor only.
 
+--[[
+
+MIDI FOCUS AND ZOOM 9000 v0.1.1
+
+--]]
+
 -- gets the track number of the passed item
 function get_track_no_of_item(item)
     local selected_item = reaper.MIDIEditor_GetTake(item)
@@ -51,44 +57,40 @@ function rezoom_horizontally(measures)
     reaper.PreventUIRefresh(1)
     
     -- save old loop and time selection settings
-    old_loop_start, old_loop_end = reaper.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
-    old_ts_start, old_ts_end = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
+    local old_loop_start, old_loop_end = reaper.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
+    local old_ts_start, old_ts_end = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
+    
+    local _40621_flag = reaper.GetToggleCommandState(40621) -- toggle loop points linked to time selection
+    if _40621_flag == 0 then
+        reaper.Main_OnCommand(40621, 0) -- toggle loop points linked to time selection
+    end
     
     -- set_time_selection_to_n_measures(measures)
-        reaper.Main_OnCommand(40222, 0) -- set start loop point
+    reaper.Main_OnCommand(40222, 0) -- set start loop point
+    for i = measures, 1, -1 do
+        reaper.Main_OnCommand(41042, 0) -- move edit cursor forward one measure
+    end
+
+    reaper.Main_OnCommand(40223, 0) -- set end loop point
+    
+    -- 40276: move edit cursor to start on time selection change, so if it's
+    -- on, we don't need to move the cursor back
+    if reaper.GetToggleCommandState(40276) == 0 then
         for i = measures, 1, -1 do
-            reaper.Main_OnCommand(41042, 0) -- move edit cursor forward one measure
+            reaper.Main_OnCommand(41043, 0) -- move edit cursor back one measure
         end
+    end
+    ---------------------------------------------
     
-        reaper.Main_OnCommand(40223, 0) -- set end loop point
-        
-        -- 40276: move edit cursor to start on time selection change, so if it's
-        -- on, we don't need to move the cursor back
-        if reaper.GetToggleCommandState(40276) == 0 then
-            for i = measures, 1, -1 do
-                reaper.Main_OnCommand(41043, 0) -- move edit cursor back one measure
-            end
-        end
+    reaper.MIDIEditor_OnCommand(ed, 40726) -- zoom to project loop selection
     
-    -- zoom_horizontally()
-        local _40621_flag = reaper.GetToggleCommandState(40621) -- toggle loop points linked to time selection
-        
-        -- we need to enable this option and then disable again later
-        if _40621_flag == 0 then
-            reaper.Main_OnCommand(40621, 0) -- toggle loop points linked to time selection
-        end
-        
-        reaper.MIDIEditor_OnCommand(ed, 40726) -- zoom to project loop selection
-        
-        if _40621_flag == 0 then
+    if _40621_flag == 0 then
         reaper.Main_OnCommand(40621, 0) -- toggle loop points linked to time selection
-        end
-        
+    end
+    
     -- restore old loop and time selection
     reaper.GetSet_LoopTimeRange2(0, true, true, old_loop_start, old_loop_end, false)
     reaper.GetSet_LoopTimeRange2(0, true, false, old_ts_start, old_ts_end, false)
-    
-    reaper.PreventUIRefresh(-1)      
         
 end
 
@@ -179,3 +181,6 @@ reaper.PreventUIRefresh(1)
 rezoom_horizontally(measures)
 reaper.PreventUIRefresh(-1)
 restore_focus_SWS()
+
+-- reaper.ShowConsoleMsg("\nCurrent def mes value: " .. reaper.GetExtState("mfz9000", "def_measures"))
+-- reaper.ShowConsoleMsg("\nCurrent track mes value: " .. reaper.GetExtState("mfz9000", "track-measures_"  .. str_trackno))
