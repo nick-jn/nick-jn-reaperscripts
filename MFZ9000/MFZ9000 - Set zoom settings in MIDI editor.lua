@@ -54,8 +54,6 @@ end
 
 -- CURRENTLY COPY-PASTED FROM THE ZOOM FILE
 function rezoom_horizontally(measures)
-    reaper.PreventUIRefresh(1)
-    
     -- save old loop and time selection settings
     local old_loop_start, old_loop_end = reaper.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
     local old_ts_start, old_ts_end = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
