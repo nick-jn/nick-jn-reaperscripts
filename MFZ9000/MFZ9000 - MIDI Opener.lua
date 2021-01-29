@@ -1,6 +1,6 @@
 --[[
 
-MIDI FOCUS AND ZOOM 9000 v0.1
+MIDI FOCUS AND ZOOM 9000 v0.1.1
 
 Opens the MIDI editor with consistent, user-defined measure-based horizontal zoom values,
 and vertical zoom values. The horizontal zoom values can be changed per track (persistent).
@@ -16,11 +16,20 @@ Usage: bind this script to the keyboard key or a mouse action of your choosing
 
 change_measures_externally = true -- use the external script to change the settings,
                                   -- otherwise set to false and manually change the value below
-measures_to_show = 4
+measures_to_show = 8
 
 vertical_zoom_level = 11 -- the script fully zooms out, and then zooms in *this* number of times
 
 -----------------------------------------------------
+
+--[[ HISTORY:
+
+-- FIXED: Issues with:
+          Move edit cursor to start on time selection change option.
+          Link loop points to time selection option.
+          
+          Now saves both old time selection and loop settings.
+]]--
 
 -- calculates the midpoint of the notes in the loop
 function calc_midpoint_pitch()
@@ -134,19 +143,30 @@ function zoom_vertically(zoom_level)
     end
 end
 
--- zooms horizontally to show n measures
-function zoom_horizontally()
-    local _40621_flag = reaper.GetToggleCommandState(40621) -- toggle loop points linked to time selection
-    
-    -- we need to enable this option and then disable again later
-    if _40621_flag == 0 then
-        reaper.Main_OnCommand(40621, 0) -- toggle loop points linked to time selection
-    end
-    
-    reaper.MIDIEditor_OnCommand(ed, 40726) -- zoom to project loop selection
-    
-    if _40621_flag == 0 then
-       reaper.Main_OnCommand(40621, 0) -- toggle loop points linked to time selection
+-- decides how many measures to show based on the settings
+function init_measures_to_show()
+    if change_measures_externally == true then
+        if reaper.GetExtState("mfz9000", "def_measures") == "" then
+            reaper.SetExtState("mfz9000", "def_measures", measures_to_show, true)
+        end
+        
+        -- change the measure zoom to either default or track-based
+        local track_measures_key = "track-measures_" .. get_track_no_of_item(reaper.MIDIEditor_GetActive())
+        local str_track_whichzoom_key = "track-whichzoom_" .. get_track_no_of_item(reaper.MIDIEditor_GetActive())
+        local _, track_whichzoom = reaper.GetProjExtState(0, "mfz9000", str_track_whichzoom_key)
+        
+        if track_whichzoom == "" then
+            measures_to_show = reaper.GetExtState("mfz9000", "def_measures")
+        else
+            track_whichzoom = tonumber(track_whichzoom)
+            if track_whichzoom == 1 then
+                _, measures_to_show = reaper.GetProjExtState(0, "mfz9000", track_measures_key)
+            else
+                measures_to_show = reaper.GetExtState("mfz9000", "def_measures")
+            end
+        end
+        
+        measures_to_show = tonumber(measures_to_show)
     end
 end
 
@@ -157,37 +177,22 @@ reaper.Main_OnCommand(40153, 0) -- open midi editor
 ed = reaper.MIDIEditor_GetActive() -- ed is global
 
 -- save old loop and time selection settings
-old_loop_start, old_loop_end = reaper.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
-old_ts_start, old_ts_end = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
+local old_loop_start, old_loop_end = reaper.GetSet_LoopTimeRange2(0, false, true, 0, 0, false)
+local old_ts_start, old_ts_end = reaper.GetSet_LoopTimeRange2(0, false, false, 0, 0, false)
 
--- init the measure setting
-if change_measures_externally == true then
-    if reaper.GetExtState("mfz9000", "def_measures") == "" then
-        reaper.SetExtState("mfz9000", "def_measures", measures_to_show, true)
-    end
-    
-    -- change the measure zoom to either default or track-based
-    local track_measures_key = "track-measures_" .. get_track_no_of_item(reaper.MIDIEditor_GetActive())
-    local str_track_whichzoom_key = "track-whichzoom_" .. get_track_no_of_item(reaper.MIDIEditor_GetActive())
-    local _, track_whichzoom = reaper.GetProjExtState(0, "mfz9000", str_track_whichzoom_key)
-    
-    if track_whichzoom == "" then
-        measures_to_show = reaper.GetExtState("mfz9000", "def_measures")
-    else
-        track_whichzoom = tonumber(track_whichzoom)
-        if track_whichzoom == 1 then
-            _, measures_to_show = reaper.GetProjExtState(0, "mfz9000", track_measures_key)
-        else
-            measures_to_show = reaper.GetExtState("mfz9000", "def_measures")
-        end
-    end
-    
-    measures_to_show = tonumber(measures_to_show)
+local _40621_flag = reaper.GetToggleCommandState(40621) -- toggle loop points linked to time selection
+if _40621_flag == 0 then
+    reaper.Main_OnCommand(40621, 0) -- toggle loop points linked to time selection
 end
 
+init_measures_to_show()
 set_time_selection_to_n_measures(measures_to_show)
-zoom_horizontally()
+reaper.MIDIEditor_OnCommand(ed, 40726) -- zoom to project loop selection
 zoom_vertically(vertical_zoom_level)
+
+if _40621_flag == 0 then
+    reaper.Main_OnCommand(40621, 0) -- toggle loop points linked to time selection
+end
 
 -- restore old loop and time selection
 reaper.GetSet_LoopTimeRange2(0, true, true, old_loop_start, old_loop_end, false)
