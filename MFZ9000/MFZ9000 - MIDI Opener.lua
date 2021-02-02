@@ -10,7 +10,7 @@ Changelog:
   # v0.3.1
 @provides
   [main] /MFZ9000/*.
-  [main] /MFZ9000/_data/*.
+  [nomain] /MFZ9000/_data/*.
 --]]
 
 --[[
