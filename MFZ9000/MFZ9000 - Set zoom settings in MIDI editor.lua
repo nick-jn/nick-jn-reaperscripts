@@ -3,7 +3,7 @@
 
 --[[
 
-MIDI FOCUS AND ZOOM 9000 v0.2
+MIDI FOCUS AND ZOOM 9000 v0.3
 
 --]]
 
@@ -25,12 +25,12 @@ local function parse_input(str_input, input_amount) -- RET: string array of corr
             reaper.MB("Bad input.", "Error", 0)
             return nil
         end
-        
+
         if token:match("%d") == nil then
             reaper.MB("Not a number: " .. token, "Error", 0)
             return nil
         end
-        
+
         if math.floor(tonumber(token)) ~= tonumber(token) then
             reaper.MB("Integers only.", "Error", 0)
             return nil
@@ -40,22 +40,22 @@ local function parse_input(str_input, input_amount) -- RET: string array of corr
             reaper.MB("Number less than 1.", "Error", 0)
             return nil
         end
-        
+
         if i == 3 and (tonumber(token) ~= 1 and tonumber(token) ~= 0) then
             reaper.MB("0 == no, 1 == yes.", "Error", 0)
             return nil
         end
-        
+
         if tonumber(token) > 256 then
             reaper.MB("Number larger than 256.", "Error", 0)
             return nil
         end
-        
+
         token = math.floor(tonumber(token)) -- for safety
         arr_input[i] = token
         i = i + 1
     end
-    
+
     -- for i, token in pairs(arr_input) do
         -- reaper.ShowConsoleMsg(token .. "\n")
     -- end
@@ -66,12 +66,14 @@ end
 -- zooms again
 local function rezoom_horizontally(active_midi_editor, measures) -- RET: void
     reaper.PreventUIRefresh(1)
-    
+    reaper.Undo_BeginBlock()
+
     local saved_ts_lp = set_time_selection_to_n_measures(measures)
     reaper.MIDIEditor_OnCommand(active_midi_editor, 40726) -- zoom to project loop selection
     -- zoom_vertically(active_midi_editor, 11, measures, false)
     __set_time_and_loop_selection(saved_ts_lp)
-    
+
+    reaper.Undo_EndBlock("", 0)
     reaper.PreventUIRefresh(-1)
 end
 
@@ -91,11 +93,11 @@ local function get_user_input(curtrack) -- RET: string of inputs, nil on no inpu
     local def_mes      = reaper.GetExtState("mfz9000", "def_measures")
     local cur_trackmes = __get_proj_extstate(__KEYSTR_TRACKMES, curtrack)
     local cur_wzoom    = __get_proj_extstate(__KEYSTR_WZOOM, curtrack)
-    
+
     if cur_wzoom == "" then
         cur_wzoom = "0"
     end
-    
+
     if cur_trackmes == "" then
         cur_trackmes = def_mes
     end
@@ -103,7 +105,7 @@ local function get_user_input(curtrack) -- RET: string of inputs, nil on no inpu
     retval, retvals_csv = reaper.GetUserInputs("MFZ9000 setup", input_amount,
     "Default number of measures:,Tracks` no. of measures:,Prefer tracks` measure value:", -- text
     def_mes .. "," .. cur_trackmes .. "," .. cur_wzoom) -- textbox values
-    
+
     if retval == false then
         return nil
     else
