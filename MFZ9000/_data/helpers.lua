@@ -1,5 +1,4 @@
 -- @noindex
--- @provides [nomain] .
 
 local script_path = debug.getinfo(1,'S').source:match[[^@?(.*[\/])[^\/]-$]]
 package.path = package.path .. ";" .. script_path .. "?.lua"
