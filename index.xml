@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="nick-jn reapack scripts" commit="f9713177d6623fcc4be9eee4cc4182a171563b2c">
+<index version="1" name="nick-jn reapack scripts" commit="40196f5ac3138335ad68c4212ffe36229d2fcbdd">
   <category name="MFZ9000">
     <reapack name="MFZ9000 - MIDI Opener.lua" type="script" desc="MFZ9000">
       <metadata>
