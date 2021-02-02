@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="nick-jn reapack scripts" commit="5c63a0ad272f38c21815dfea646c6a69d5dbecbf">
+<index version="1" commit="5c63a0ad272f38c21815dfea646c6a69d5dbecbf">
   <category name="MFZ9000">
     <reapack name="MFZ9000 - MIDI Opener.lua" type="script" desc="MFZ9000">
       <metadata>
@@ -14,8 +14,11 @@
       </metadata>
       <version name="0.3.1" author="nick-jn" time="2021-02-02T22:23:45Z">
         <changelog><![CDATA[# v0.3.1]]></changelog>
-        <source main="main">https://github.com/nick-jn/nick-jn-reaperscripts/raw/f9713177d6623fcc4be9eee4cc4182a171563b2c/MFZ9000/MFZ9000%20-%20MIDI%20Opener.lua</source>
-        <source main="main" file="MFZ9000 - Set zoom settings in MIDI editor.lua">https://github.com/nick-jn/nick-jn-reaperscripts/raw/f9713177d6623fcc4be9eee4cc4182a171563b2c/MFZ9000/MFZ9000%20-%20Set%20zoom%20settings%20in%20MIDI%20editor.lua</source>
+        <source main="main">https://github.com/nick-jn/nick-jn-reaperscripts/raw/5c63a0ad272f38c21815dfea646c6a69d5dbecbf/MFZ9000/MFZ9000%20-%20MIDI%20Opener.lua</source>
+        <source main="midi_editor" file="MFZ9000 - Set zoom settings in MIDI editor.lua">https://github.com/nick-jn/nick-jn-reaperscripts/raw/5c63a0ad272f38c21815dfea646c6a69d5dbecbf/MFZ9000/MFZ9000%20-%20Set%20zoom%20settings%20in%20MIDI%20editor.lua</source>
+        <source file="_data/constants.lua">https://github.com/nick-jn/nick-jn-reaperscripts/raw/5c63a0ad272f38c21815dfea646c6a69d5dbecbf/MFZ9000/_data/constants.lua</source>
+        <source file="_data/helpers.lua">https://github.com/nick-jn/nick-jn-reaperscripts/raw/5c63a0ad272f38c21815dfea646c6a69d5dbecbf/MFZ9000/_data/helpers.lua</source>
+        <source file="_data/zoom_and_focus.lua">https://github.com/nick-jn/nick-jn-reaperscripts/raw/5c63a0ad272f38c21815dfea646c6a69d5dbecbf/MFZ9000/_data/zoom_and_focus.lua</source>
       </version>
     </reapack>
   </category>
