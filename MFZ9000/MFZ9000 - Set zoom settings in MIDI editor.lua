@@ -1,3 +1,5 @@
+-- @noindex
+
 -- For use with "MFZ9000 open MIDI item" only.
 -- For use in MIDI editor only.
 

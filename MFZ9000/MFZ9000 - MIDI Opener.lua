@@ -1,4 +1,18 @@
 --[[
+Description: MFZ9000
+About: Focus and zoom management suite for MIDI.
+Version: 0.3.1
+Author: nick-jn
+License: GNU GPL v3
+Links:
+  https://forum.cockos.com/showthread.php?t=248741
+Changelog:
+  # v0.3.1
+@provides
+  [main] /MFZ9000/*.
+--]]
+
+--[[
 
 MIDI FOCUS AND ZOOM 9000 v0.3.1
 
