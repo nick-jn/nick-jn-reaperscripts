@@ -9,8 +9,8 @@ Links:
 Changelog:
   # v0.3.1
 @provides
-  [main] MFZ9000/MFZ9000 - MIDI Opener.lua
-  [main=midi_editor] MFZ9000/MFZ9000 - Set zoom settings in MIDI editor.lua
+  [main] MFZ9000 - MIDI Opener.lua
+  [main=midi_editor] MFZ9000 - Set zoom settings in MIDI editor.lua
   _data/constants.lua
   _data/helpers.lua
   _data/zoom_and_focus.lua
