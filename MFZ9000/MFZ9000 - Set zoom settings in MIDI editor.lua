@@ -3,7 +3,7 @@
 
 --[[
 
-MIDI FOCUS AND ZOOM 9000 v0.3
+MIDI FOCUS AND ZOOM 9000 v0.3.1
 
 --]]
 
@@ -68,7 +68,7 @@ local function rezoom_horizontally(active_midi_editor, measures) -- RET: void
     reaper.PreventUIRefresh(1)
     reaper.Undo_BeginBlock()
 
-    local saved_ts_lp = set_time_selection_to_n_measures(measures)
+    local saved_ts_lp = set_time_selection_to_n_measures(active_midi_editor, measures)
     reaper.MIDIEditor_OnCommand(active_midi_editor, 40726) -- zoom to project loop selection
     -- zoom_vertically(active_midi_editor, 11, measures, false)
     __set_time_and_loop_selection(saved_ts_lp)

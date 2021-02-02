@@ -109,12 +109,14 @@ end
 -- returns the type of the selected media item as a string, nil if no items are selected
 function __get_selected_media_item_type() -- RET: string
     local selected_media_item = reaper.GetSelectedMediaItem(0, 0)
-
     if selected_media_item == nil then
         return nil
     end
 
     local active_take = reaper.GetActiveTake(selected_media_item)
+    if active_take == nil then
+        return nil
+    end
 
     return reaper.GetMediaSourceType(reaper.GetMediaItemTake_Source(active_take), "")
 end

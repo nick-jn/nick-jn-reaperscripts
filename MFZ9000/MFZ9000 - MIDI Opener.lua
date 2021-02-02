@@ -1,6 +1,8 @@
 --[[
 
-MIDI FOCUS AND ZOOM 9000 v0.3
+MIDI FOCUS AND ZOOM 9000 v0.3.1
+
+https://forum.cockos.com/showthread.php?t=248741
 
 Opens the MIDI editor with consistent, user-defined measure-based horizontal zoom values,
 and vertical zoom values. The horizontal zoom values can be changed per track (persistent).
@@ -31,14 +33,19 @@ open_at_mouse_cursor = true  -- will open at mouse cursor instead of at edit cur
 move_the_edit_cursor_to_mouse_cursor = true   -- if open_at_mouse_cursor is true, then it will shift
                                               -- the edit cursor to where you clicked in the arrange view
 
------ EXTRA SETTINGS -----
-
--- these settings are a bit experimental, if bugs occur - please report them
-
 show_only_the_selected_item = true -- the viewport will focus ONLY on the selected item
 
 center_small_items = true -- the viewport will center on items of sufficiently small length
                           -- instead of showing them from the left edge of the viewport
+
+open_video_in_external_editor = false -- I'm not sure what the behaviour should be here, but in
+                                      -- case you've defined an external editor for a video item,
+                                      -- set it to true, and double clicking on the item will
+                                      -- open the editor
+
+----- EXTRA SETTINGS -----
+
+-- these settings are still a bit experimental, if bugs occur - please report them
 
 pad_small_items = true -- don't stretch very small items the entire length
 padding_amount  = 1 -- measures in 4/4 (can be set to rational numbers too, best to use .5 increments)
@@ -116,16 +123,18 @@ end
 local function main()
     local selected_item_type = __get_selected_media_item_type()
 
-    -- make sure to activate the appropriate action for all item types
     if selected_item_type == nil then
         return
-    elseif selected_item_type == "RPP_PROJECT" then
-        reaper.Main_OnCommand(41816, 0) -- open associated project in new tab
+    elseif selected_item_type == "MIDI" or selected_item_type == "MIDIPOOL" then
+        -- do nothing
+    elseif selected_item_type == "VIDEO" and open_video_in_external_editor == true then
+        reaper.Main_OnCommand(40109, 0) -- open items in primary external editor
         return
-    elseif selected_item_type ~= "MIDI" then
+    else
         reaper.Main_OnCommand(40009, 0) -- show media item/take properties
         return
     end
+    -- reaper.ShowConsoleMsg(selected_item_type .. "\n")
 
     reaper.PreventUIRefresh(1)
     reaper.Undo_BeginBlock()

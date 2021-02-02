@@ -10,37 +10,21 @@ function shift_pitch_cursor(active_midi_editor, new_pitch_cursor_value) -- RET: 
     local target_note = new_pitch_cursor_value % 12
     -- offset by 5 to get into F# <-> F# range (F#-shifted octave), subtract 5 to offset the starting octave (C4, the 5th)
     local octave_shift = math.abs(math.floor((new_pitch_cursor_value + 5) / 12) - 5)
-    local shift_func_table = {
-        reaper.MIDIEditor_OnCommand, --  1 | move pitch cursor to nearest C (41094)
-        reaper.MIDIEditor_OnCommand, --  2 | move pitch cursor to nearest C#
-        reaper.MIDIEditor_OnCommand, --  3 | move pitch cursor to nearest D
-        reaper.MIDIEditor_OnCommand, --  4 | move pitch cursor to nearest D#
-        reaper.MIDIEditor_OnCommand, --  5 | move pitch cursor to nearest E
-        reaper.MIDIEditor_OnCommand, --  6 | move pitch cursor to nearest F
-        reaper.MIDIEditor_OnCommand, --  7 | move pitch cursor to nearest F#
-        reaper.MIDIEditor_OnCommand, --  8 | move pitch cursor to nearest G
-        reaper.MIDIEditor_OnCommand, --  9 | move pitch cursor to nearest G#
-        reaper.MIDIEditor_OnCommand, -- 10 | move pitch cursor to nearest A
-        reaper.MIDIEditor_OnCommand, -- 11 | move pitch cursor to nearest A#
-        reaper.MIDIEditor_OnCommand  -- 12 | move pitch cursor to nearest B
-    }
 
     reaper.MIDIEditor_OnCommand(active_midi_editor, 41297) -- move pitch cursor to C4 (60)
+    reaper.MIDIEditor_OnCommand(active_midi_editor, target_note + 41094)
 
     -- calculate the direction and the shift amount
     if new_pitch_cursor_value >= 66 then -- 66 == F#4
         pitch_cursor_direction = 1
-        if new_pitch_cursor_value > 126 then
-            octave_shift = octave_shift - 1 -- no octave (F#-shifted) above F#9
-        end
     elseif new_pitch_cursor_value <= 54 then -- 54 == F#3
         pitch_cursor_direction = -1
-        if new_pitch_cursor_value <= 6 then
-            octave_shift = octave_shift - 1 -- no octave (F#-shifted) below F#-1
-        end
     else
         pitch_cursor_direction = 0
     end
+
+    -- reaper.ShowConsoleMsg("\nnew_pitch_cursor_value note: " .. new_pitch_cursor_value)
+    -- reaper.ShowConsoleMsg("\ntarget note (mod12): " .. target_note .. " | octave shift: " .. octave_shift)
 
     -- move the pitch cursor to the correct octave (F#-shifted)
     if pitch_cursor_direction == 1 then
@@ -52,22 +36,6 @@ function shift_pitch_cursor(active_midi_editor, new_pitch_cursor_value) -- RET: 
             reaper.MIDIEditor_OnCommand(active_midi_editor, 40188) -- decrease pitch cursor one octave
         end
     end
-
-    -- move the pitch cursor to the correct note within the octave (F#-shifted)
-    if new_pitch_cursor_value == 127 then
-        for i = new_pitch_cursor_value - 1, 120, -1 do -- 120 == C-9 note
-            reaper.MIDIEditor_OnCommand(active_midi_editor, 40049) -- increase pitch cursor one semitone
-        end
-    elseif new_pitch_cursor_value <= 6 then
-        for i = 12, new_pitch_cursor_value + 1, -1 do -- 12 == C-1 note
-            reaper.MIDIEditor_OnCommand(active_midi_editor, 40050) -- decrease pitch cursor one semitone
-        end
-    else
-        shift_func_table[target_note + 1](active_midi_editor, target_note + 41094)
-    end
-
-    -- reaper.ShowConsoleMsg("\nnew_pitch_cursor_value note: " .. new_pitch_cursor_value)
-    -- reaper.ShowConsoleMsg("\ntarget note+1 (mod): " .. target_note+1 .. " | octave shift: " .. octave_shift)
 
     return pitch_cursor_direction
 end
