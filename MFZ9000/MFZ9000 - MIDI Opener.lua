@@ -9,8 +9,8 @@ Links:
 Changelog:
   # v0.3.1
 @provides
-  [main] /MFZ9000/*.
-  [nomain] /MFZ9000/_data/*.
+  [main] /MFZ9000/*.lua
+  /MFZ9000/_data/*.lua
 --]]
 
 --[[
